@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant browser
+    participant server
+    
+    Note right of browser: Usuario escribe una nota y hace clic en Save
+    
+    Note right of browser: JavaScript (spa.js) intercepta el envío del formulario<br/>y evita el comportamiento por defecto
+    
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+    activate server
+    Note left of server: Servidor recibe la nueva nota en formato JSON<br/>y la añade a data.json
+    server-->>browser: JSON response {message: "note created"}
+    deactivate server
+    
+    Note right of browser: El callback de éxito en spa.js:<br/>1. Añade la nueva nota al array local de notas<br/>2. Vuelve a renderizar la lista de notas<br/>3. Limpia el formulario<br/>TODO sin recargar la página
