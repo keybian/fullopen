@@ -12,6 +12,10 @@ const Hello = (props: any) => {
 const App = () => {
 
   console.log('Hello from component')
+  const friends = [
+    { name: 'Peter', age: 4 },
+    { name: 'Maya', age: 10 },
+  ]
   const name = 'Peter'
   const age = 10
   const now = new Date()
@@ -26,6 +30,8 @@ const App = () => {
       <p>
         {a} plus {b} is {a + b}
       </p>
+      <p>{friends[0].name} {friends[0].age}</p>
+      <p>{friends[1].name} {friends[1].age}</p>
     </div>
   )
 }
