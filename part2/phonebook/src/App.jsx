@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import viteLogo from '/vite.svg'
 import Person from './components/Person'
+import FilterPerson from './components/FilterPerson'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -23,7 +26,8 @@ const App = () => {
     if (findName === undefined) {
       const newObject = {
         name: newName,
-        number: newPhone
+        number: newPhone,
+        id: persons.length + 1
       }
 
       setPersons(persons.concat(newObject))
@@ -54,26 +58,18 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      filter shown with:<input value={filterName} onChange={handleFilterPersonChange} />
-      <form onSubmit={addPerson}>
-        <h2>add a new</h2>
-        <div>
-          name:<input value={newName} onChange={handlePersonChange} />
-        </div>
-        <div>
-          number:<input value={newPhone} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type='submit'>add</button>
-        </div>
-      </form>
+
+      <FilterPerson filterName={filterName} onChange={handleFilterPersonChange} />
+
+      <PersonForm addPerson={addPerson} newName={newName}
+        onChangeName={handlePersonChange}
+        newPhone={newPhone}
+        onChangePhone={handleNumberChange}
+      />
       <h2>Numbers</h2>
-      <ul>
-        {personsToShow.map(person =>
-          <Person key={person.id} person={person} />
-        )}
-      </ul>
-      <div>debug: {newName}</div>
+
+      <Persons personsToShow={personsToShow} newName={newName} newPhone={newPhone} />
+
     </div>
   )
 }
