@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import personService from './service/persons'
 import viteLogo from '/vite.svg'
 import Person from './components/Person'
 import FilterPerson from './components/FilterPerson'
@@ -6,35 +7,55 @@ import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+  const [persons, setPersons] = useState([])
   console.log('person', persons)
 
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [filterName, setFilterName] = useState('')
 
+  const hook = () => {
+    console.log('effect')
+    personService
+      .getAll()
+      .then(returndPersons => {
+        console.log('promise fulfilled')
+        setPersons(returndPersons)
+      })
+
+  }
+
+  useEffect(hook, [])
+
   const addPerson = (event) => {
     event.preventDefault()
     console.log('addPerson', persons)
-    const findName = persons.find((x) => x.name === newName.trim())
+    const newPersons = [...persons]
+    console.log('newPersons', newPersons)
+    const findName = newPersons.find((x) => x.name === newName.trim())
+    console.log('findName', findName)
     console.log(findName)
     if (findName === undefined) {
+      const max = newPersons.reduce((prev, current) => (prev.id > current.id) ? prev : current);
+      console.log(max)
       const newObject = {
         name: newName,
         number: newPhone,
-        id: persons.length + 1
+        id: max.id + 1
       }
+      personService
+        .create(newObject)
+        .then(returnedPersons => {
+          console.log(returnedPersons)
+          setPersons(newPersons.concat(returnedPersons))
+          setNewName('')
+          setNewPhone('')
+        })
 
-      setPersons(persons.concat(newObject))
-      setNewName('')
-      setNewPhone('')
     } else {
-      alert(`${newName}  is already added to phonebook`)
+      if (confirm(`${findName.name}  is already added to phonebook, replace the odl number with a new one`)) {
+        toggleUpdateNumber(findName.id)
+      }
     }
 
   }
@@ -52,6 +73,42 @@ const App = () => {
 
   }
 
+  const toggleDelete = (id) => {
+    const person = personsToShow.find(x => x.id === id)
+    const changePerson = { ...person }
+
+
+    personService
+      .deletedPerson(id, changePerson)
+      .then(returnPerson => {
+        console.log("returnPerson", returnPerson)
+        console.log("return   Person", persons)
+        setPersons(persons.filter(x => x.id !== id))
+      })
+
+
+  }
+
+  const toggleUpdateNumber = (id) => {
+    const person = personsToShow.find(x => x.id === id)
+    const changePerson = { ...person, number: newPhone }
+
+
+    personService
+      .update(id, changePerson)
+      .then(returnPerson => {
+        console.log("returnPerson", returnPerson)
+        setPersons(persons.map(x => x.id !== id ? x : returnPerson))
+      })
+      .catch(error => {
+        alert(`the Person '${person.name}' was already deleted from server`)
+        setPersons(persons.filter(x => x.id !== id))
+      })
+
+
+  }
+
+
   const personsToShow = filterName.length === 0 ? persons : persons.filter(x => x.name.toLowerCase().includes(filterName.toLowerCase()))
 
 
@@ -68,7 +125,7 @@ const App = () => {
       />
       <h2>Numbers</h2>
 
-      <Persons personsToShow={personsToShow} newName={newName} newPhone={newPhone} />
+      <Persons personsToShow={personsToShow} newName={newName} newPhone={newPhone} toggleDelete={toggleDelete} />
 
     </div>
   )
