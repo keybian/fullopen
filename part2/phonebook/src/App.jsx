@@ -5,6 +5,7 @@ import Person from './components/Person'
 import FilterPerson from './components/FilterPerson'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -13,6 +14,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [sendMessage, setsendMessage] = useState(null)
+  const [typeClassName, setTypeClassName] = useState('error')
 
   const hook = () => {
     console.log('effect')
@@ -48,6 +51,11 @@ const App = () => {
         .then(returnedPersons => {
           console.log(returnedPersons)
           setPersons(newPersons.concat(returnedPersons))
+          setsendMessage(`Added ${returnedPersons.name}`)
+          setTypeClassName('ok')
+          setTimeout(() => {
+            setsendMessage(null)
+          }, 3000);
           setNewName('')
           setNewPhone('')
         })
@@ -55,6 +63,13 @@ const App = () => {
     } else {
       if (confirm(`${findName.name}  is already added to phonebook, replace the odl number with a new one`)) {
         toggleUpdateNumber(findName.id)
+        setsendMessage(`${findName.name} the odl number replaced`)
+        setTypeClassName('ok')
+        setNewName('')
+        setNewPhone('')
+        setTimeout(() => {
+          setsendMessage(null)
+        }, 3000);
       }
     }
 
@@ -101,7 +116,8 @@ const App = () => {
         setPersons(persons.map(x => x.id !== id ? x : returnPerson))
       })
       .catch(error => {
-        alert(`the Person '${person.name}' was already deleted from server`)
+        setsendMessage(`the Person '${person.name}' was already deleted from server`)
+        setTypeClassName('error')
         setPersons(persons.filter(x => x.id !== id))
       })
 
@@ -115,7 +131,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Notification message={sendMessage} className={typeClassName} />
       <FilterPerson filterName={filterName} onChange={handleFilterPersonChange} />
 
       <PersonForm addPerson={addPerson} newName={newName}
