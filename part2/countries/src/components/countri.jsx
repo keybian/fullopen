@@ -31,6 +31,9 @@ const Countri = ({ countri }) => {
             </ul>
 
             <img src={(Object.values(detailsCountri.flags).find(flag => esUrl(flag)))} />
+            <h2>Weather in  {detailsCountri.capital === undefined ? 'no found' : detailsCountri.capital.toString()}</h2>
+            <p>Temperature : </p>
+            <p>Wind : </p>
         </div>
     )
 
