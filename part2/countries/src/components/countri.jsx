@@ -1,4 +1,4 @@
-const Countri = ({ countri }) => {
+const Countri = ({ countri, weatherTemp, weatherWind }) => {
 
     if (countri === null) {
         return null
@@ -32,8 +32,8 @@ const Countri = ({ countri }) => {
 
             <img src={(Object.values(detailsCountri.flags).find(flag => esUrl(flag)))} />
             <h2>Weather in  {detailsCountri.capital === undefined ? 'no found' : detailsCountri.capital.toString()}</h2>
-            <p>Temperature : </p>
-            <p>Wind : </p>
+            <p>Temperature : {weatherTemp} Celsius</p>
+            <p>Wind : {weatherWind} m/s</p>
         </div>
     )
 
